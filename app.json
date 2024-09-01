@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Roling",
+    "slug": "roling",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.roling.roling"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.roling.roling"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "70e1ffec-b691-4574-81a2-1d5ff3431baf"
+      }
+    },
+    "owner": "roling",
+    "updates": {
+      "url": "https://u.expo.dev/70e1ffec-b691-4574-81a2-1d5ff3431baf"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
