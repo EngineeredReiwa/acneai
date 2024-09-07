@@ -1,45 +1,49 @@
 {
-  "cli": {
-    "version": ">= 11.0.3"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
+    "cli": {
+        "version": ">= 11.0.3"
     },
-    "development-simulator": {
-      "extends": "development",
-      "ios": {
-        "simulator": true
-      }
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "android": {
+                "image": "latest"
+            },
+            "ios": {
+                "image": "latest"
+            }
+        },
+        "development-simulator": {
+            "extends": "development",
+            "ios": {
+                "simulator": true
+            }
+        },
+        // Simulatorのビルド設定
+        // eas build --platform ios --profile preview
+        "preview": {
+            "distribution": "internal",
+            "channel": "main",
+            "android": {
+                "buildType": "apk",
+                "image": "latest"
+            },
+            "ios": {
+                "simulator": true,
+                "image": "latest"
+            }
+        },
+        "production": {
+            "channel": "production",
+            "android": {
+                "image": "latest"
+            },
+            "ios": {
+                "image": "latest"
+            }
+        }
     },
-    "preview": {
-      "distribution": "internal",
-      "channel": "main",
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
-    },
-    "production": {
-      "channel": "production",
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
+    "submit": {
+        "production": {}
     }
-  },
-  "submit": {
-    "production": {}
-  }
 }

@@ -5,12 +5,16 @@ import {
     StyleSheet,
     SafeAreaView,
     TouchableOpacity,
+    Switch,
+    TextInput,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 
 import { useSession } from "../../ctx";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { Picker } from "@react-native-picker/picker";
+
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 
@@ -29,6 +33,16 @@ export default function SignUp() {
             null
         );
     console.log("hi");
+
+    const [gender, setGender] = useState(false);
+    const [birthDate, setBirthDate] = useState("");
+    const [nickname, setNickname] = useState("");
+    const skinConcerns = ["acne"];
+    type SkinConcern = (typeof skinConcerns)[number];
+    const [skinConcern, setSkinConcern] = useState<SkinConcern>("acne");
+    const skinTypes = ["oily", "dry", "normal", "combination"];
+    type SkinType = (typeof skinTypes)[number];
+    const [skinType, setSkinType] = useState<SkinType>("oily");
 
     const [credential, setCredential] = useState<any>("testtest");
 
@@ -58,6 +72,7 @@ export default function SignUp() {
         // Sign the user in with the credential
         return auth().signInWithCredential(appleCredential);
     }
+
     return (
         <SafeAreaView
             style={{
@@ -71,6 +86,60 @@ export default function SignUp() {
                 <ThemedText type="title" style={{ textAlign: "center" }}>
                     アカウント登録
                 </ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.formContainer}>
+                <View style={styles.formItem}>
+                    <Text>性別</Text>
+                    <Switch
+                        value={gender}
+                        onValueChange={(value) => setGender(value)}
+                    />
+                </View>
+                <View style={styles.formItem}>
+                    <Text>生年月日</Text>
+                    <TextInput
+                        style={styles.formInput}
+                        value={birthDate}
+                        onChangeText={(text) => setBirthDate(text)}
+                        placeholder="YYYY-MM-DD"
+                    />
+                </View>
+                <View style={styles.formItem}>
+                    <Text>ニックネーム</Text>
+                    <TextInput
+                        style={styles.formInput}
+                        value={nickname}
+                        onChangeText={(text) => setNickname(text)}
+                    />
+                </View>
+                <View style={styles.formItem}>
+                    <Text>現状の肌の悩み</Text>
+                    <Picker
+                        selectedValue={skinConcern}
+                        onValueChange={(itemValue) => setSkinConcern(itemValue)}
+                    >
+                        {/* SkinConcern型を配列化して、map関数 */}
+
+                        {skinConcerns.map((concern) => (
+                            <Picker.Item
+                                key={concern}
+                                label={concern}
+                                value={concern}
+                            />
+                        ))}
+                    </Picker>
+                </View>
+                <View style={styles.formItem}>
+                    <Text>肌タイプ</Text>
+                    <Picker
+                        selectedValue={skinType}
+                        onValueChange={(itemValue) => setSkinType(itemValue)}
+                    >
+                        {skinTypes.map((type) => (
+                            <Picker.Item key={type} label={type} value={type} />
+                        ))}
+                    </Picker>
+                </View>
             </ThemedView>
             <Text
                 onPress={() => {
@@ -106,15 +175,6 @@ export default function SignUp() {
                         )
                     }
                 />
-                <TouchableOpacity
-                    style={{
-                        width: 160,
-                        height: 45,
-                    }}
-                    onPress={onAppleButtonPress}
-                >
-                    <Text>aaaa</Text>
-                </TouchableOpacity>
                 <Text>{credential}</Text>
             </View>
         </SafeAreaView>
@@ -128,6 +188,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: 8,
     },
+    formContainer: {
+        flex: 1,
+    },
+    formItem: {},
+    formInput: {},
     container: {
         // flex: 1,
         alignItems: "center",
