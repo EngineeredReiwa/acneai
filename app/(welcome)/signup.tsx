@@ -1,12 +1,24 @@
 import { router } from "expo-router";
-import { Text, View, StyleSheet, SafeAreaView } from "react-native";
+import {
+    Text,
+    View,
+    StyleSheet,
+    SafeAreaView,
+    TouchableOpacity,
+} from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
+import {
+    AppleButton,
+    appleAuth,
+} from "@invertase/react-native-apple-authentication";
 
 import { useSession } from "../../ctx";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
+
+import { getAuth, signInWithPopup, OAuthProvider } from "firebase/auth";
 
 export default function SignUp() {
     const { signIn, signOut, session } = useSession();
@@ -17,6 +29,9 @@ export default function SignUp() {
             null
         );
     console.log("hi");
+
+    const auth = getAuth();
+    const provider = new OAuthProvider("apple.com");
 
     useEffect(() => {
         const checkAvailable = async () => {
@@ -80,6 +95,34 @@ export default function SignUp() {
         }
     };
 
+    async function onAppleButtonPress() {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                // The signed-in user info.
+                const user = result.user;
+
+                // Apple credential
+                const credential = OAuthProvider.credentialFromResult(result);
+                if (!credential) return;
+                const accessToken = credential.accessToken;
+                const idToken = credential.idToken;
+
+                // IdP data available using getAdditionalUserInfo(result)
+                // ...
+            })
+            .catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.customData.email;
+                // The credential that was used.
+                const credential = OAuthProvider.credentialFromError(error);
+
+                // ...
+            });
+    }
+
     return (
         <SafeAreaView
             style={{
@@ -137,6 +180,17 @@ export default function SignUp() {
                         }
                     }}
                 />
+                <TouchableOpacity
+                    style={{
+                        width: 160,
+                        height: 45,
+                    }}
+                    onPress={() => {
+                        onAppleButtonPress();
+                    }}
+                >
+                    <Text>aaaa</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
