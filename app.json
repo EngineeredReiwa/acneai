@@ -13,6 +13,7 @@
             "backgroundColor": "#ffffff"
         },
         "ios": {
+            "googleServicesFile": "./GoogleService-Info.plist",
             "supportsTablet": true,
             "bundleIdentifier": "com.EngineeredReiwa.AcneAI",
             "usesAppleSignIn": true,
@@ -21,6 +22,7 @@
             }
         },
         "android": {
+            "googleServicesFile": "./google-services.json",
             "adaptiveIcon": {
                 "foregroundImage": "./assets/images/adaptive-icon.png",
                 "backgroundColor": "#ffffff"
@@ -40,7 +42,17 @@
                     "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
                 }
             ],
-            "expo-apple-authentication"
+            "@react-native-firebase/app",
+            "@react-native-firebase/auth",
+            "@react-native-firebase/crashlytics",
+            [
+                "expo-build-properties",
+                {
+                    "ios": {
+                        "useFrameworks": "static"
+                    }
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true

@@ -7,10 +7,6 @@ import {
     TouchableOpacity,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
-import {
-    AppleButton,
-    appleAuth,
-} from "@invertase/react-native-apple-authentication";
 
 import { useSession } from "../../ctx";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,7 +14,11 @@ import { ThemedText } from "@/components/ThemedText";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 
-import { getAuth, signInWithPopup, OAuthProvider } from "firebase/auth";
+import auth from "@react-native-firebase/auth";
+import {
+    appleAuth,
+    AppleButton,
+} from "@invertase/react-native-apple-authentication";
 
 export default function SignUp() {
     const { signIn, signOut, session } = useSession();
@@ -30,99 +30,34 @@ export default function SignUp() {
         );
     console.log("hi");
 
-    const auth = getAuth();
-    const provider = new OAuthProvider("apple.com");
-
-    useEffect(() => {
-        const checkAvailable = async () => {
-            const isAvailable = await AppleAuthentication.isAvailableAsync();
-            setAppleAuthAvailable(isAvailable);
-
-            if (isAvailable) {
-                const credentialJson = await SecureStore.getItemAsync(
-                    "apple-credentials"
-                );
-                if (credentialJson) setAppleToken(JSON.parse(credentialJson));
-            }
-        };
-        checkAvailable();
-    }, []);
-
-    const login = async () => {
-        try {
-            const credential = await AppleAuthentication.signInAsync({
-                requestedScopes: [
-                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                ],
-            });
-            console.log(credential);
-            // if (credential) setAppleToken(credential);
-            // SecureStore.setItemAsync(
-            //     "apple-credentials",
-            //     JSON.stringify(credential)
-            // );
-            signIn("apple-credentials", credential);
-            router.replace("/(tabs)");
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const getCredentialState = async () => {
-        if (!appleToken) return;
-        const credentialState =
-            await AppleAuthentication.getCredentialStateAsync(appleToken.user);
-        console.log(credentialState);
-    };
-
-    const logout = async () => {
-        SecureStore.deleteItemAsync("apple-credentials");
-        setAppleToken(null);
-    };
-
-    const refresh = async () => {
-        if (appleToken) {
-            const result = await AppleAuthentication.refreshAsync({
-                user: appleToken.user,
-            });
-            console.log(result);
-            setAppleToken(result);
-            SecureStore.setItemAsync(
-                "apple-credentials",
-                JSON.stringify(result)
-            );
-        }
-    };
+    const [credential, setCredential] = useState<any>("testtest");
 
     async function onAppleButtonPress() {
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                // The signed-in user info.
-                const user = result.user;
+        // Start the sign-in request
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+            requestedOperation: appleAuth.Operation.LOGIN,
+            // As per the FAQ of react-native-apple-authentication, the name should come first in the following array.
+            // See: https://github.com/invertase/react-native-apple-authentication#faqs
+            requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+        });
 
-                // Apple credential
-                const credential = OAuthProvider.credentialFromResult(result);
-                if (!credential) return;
-                const accessToken = credential.accessToken;
-                const idToken = credential.idToken;
+        // Ensure Apple returned a user identityToken
+        if (!appleAuthRequestResponse.identityToken) {
+            throw new Error(
+                "Apple Sign-In failed - no identify token returned"
+            );
+        }
 
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
-            })
-            .catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The credential that was used.
-                const credential = OAuthProvider.credentialFromError(error);
+        // Create a Firebase credential from the response
+        const { identityToken, nonce } = appleAuthRequestResponse;
+        const appleCredential = auth.AppleAuthProvider.credential(
+            identityToken,
+            nonce
+        );
 
-                // ...
-            });
+        // Sign the user in with the credential
+        return auth().signInWithCredential(appleCredential);
     }
-
     return (
         <SafeAreaView
             style={{
@@ -158,39 +93,29 @@ export default function SignUp() {
             </Text>
 
             <View style={styles.container}>
-                <AppleAuthentication.AppleAuthenticationButton
-                    buttonType={
-                        AppleAuthentication.AppleAuthenticationButtonType
-                            .SIGN_IN
-                    }
-                    buttonStyle={
-                        AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                    }
-                    cornerRadius={5}
-                    style={styles.button}
-                    onPress={async () => {
-                        try {
-                            login();
-                        } catch (e: any) {
-                            if (e.code === "ERR_REQUEST_CANCELED") {
-                                // handle that the user canceled the sign-in flow
-                            } else {
-                                // handle other errors
-                            }
-                        }
+                <AppleButton
+                    buttonStyle={AppleButton.Style.WHITE}
+                    buttonType={AppleButton.Type.SIGN_IN}
+                    style={{
+                        width: 160,
+                        height: 45,
                     }}
+                    onPress={() =>
+                        onAppleButtonPress().then(() =>
+                            console.log("Apple sign-in complete!")
+                        )
+                    }
                 />
                 <TouchableOpacity
                     style={{
                         width: 160,
                         height: 45,
                     }}
-                    onPress={() => {
-                        onAppleButtonPress();
-                    }}
+                    onPress={onAppleButtonPress}
                 >
                     <Text>aaaa</Text>
                 </TouchableOpacity>
+                <Text>{credential}</Text>
             </View>
         </SafeAreaView>
     );

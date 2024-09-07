@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
@@ -39,8 +38,9 @@ expo-env.d.ts
 app-example
 
 # Cred
+app/env/
 env/
-=======
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -103,4 +103,10 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
->>>>>>> origin/main
+
+./google-services.json
+./GoogleService-Info.plist
+
+# https://docs.expo.dev/workflow/prebuild/#usage-with-eas-build
+/android
+/ios
