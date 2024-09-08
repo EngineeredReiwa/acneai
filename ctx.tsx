@@ -32,19 +32,17 @@ export function useSession() {
 }
 
 export function SessionProvider({ children }: PropsWithChildren) {
-    const [[isLoading, session], setSession] = useStorageState("session");
-    const [[isLoadingg, provider], setProvider] = useStorageState("provider");
+    const [[isLoading, credential], setCredential] =
+        useStorageState("credential");
 
     return (
         <AuthContext.Provider
             value={{
-                signIn: (prov, cred) => {
-                    setProvider(prov);
-                    setSession(cred);
+                signIn: (cred) => {
+                    setCredential(cred);
                 },
                 signOut: () => {
-                    setProvider(null);
-                    setSession(null);
+                    setCredential(null);
                 },
                 provider,
                 session,

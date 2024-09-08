@@ -6,6 +6,7 @@ import {
     SafeAreaView,
     Image,
     TouchableOpacity,
+    Platform,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 
@@ -14,6 +15,10 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { HelloWave } from "@/components/HelloWave";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { AppleButton } from "@invertase/react-native-apple-authentication";
+import { GoogleSigninButton } from "react-native-google-signin";
+import { onAppleButtonPress } from "../api/apple";
+import { onGoogleButtonPress } from "../api/google";
 
 export default function Welcome() {
     const { signIn, signOut } = useSession();
@@ -65,7 +70,7 @@ export default function Welcome() {
                     はじめる
                 </ThemedText>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={{
                     borderColor: color,
                     borderWidth: 1,
@@ -82,7 +87,20 @@ export default function Welcome() {
                 >
                     ログイン
                 </ThemedText>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            {/* {Platform.OS === "ios" && ( */}
+            <AppleButton
+                buttonStyle={AppleButton.Style.BLACK}
+                buttonType={AppleButton.Type.SIGN_IN}
+                buttonText="Sign in with Apple"
+                style={{
+                    width: 300,
+                    height: 45,
+                }}
+                onPress={() => {
+                    onAppleButtonPress();
+                }}
+            />
         </SafeAreaView>
     );
 }

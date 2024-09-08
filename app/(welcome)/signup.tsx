@@ -13,12 +13,14 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { ThemedText } from "@/components/ThemedText";
 
 import auth from "@react-native-firebase/auth";
-import firestore from "@react-native-firebase/firestore";
 
 import {
     appleAuth,
     AppleButton,
 } from "@invertase/react-native-apple-authentication";
+import { saveUserData } from "../api/firestore";
+import { onAppleButtonPress } from "../api/apple";
+import { router } from "expo-router";
 
 export default function SignUp() {
     const [credential, setCredential] = useState<any>(null);
@@ -51,82 +53,26 @@ export default function SignUp() {
         }
 
         setErrorText(null); // エラーがない場合はエラーをクリア
-        onAppleButtonPress().then(() => console.log("Apple sign-in complete!"));
-    };
-
-    async function onAppleButtonPress() {
-        try {
-            // Start the sign-in request
-            const appleAuthRequestResponse = await appleAuth
-                .performRequest({
-                    requestedOperation: appleAuth.Operation.LOGIN,
-                    // As per the FAQ of react-native-apple-authentication, the name should come first in the following array.
-                    // See: https://github.com/invertase/react-native-apple-authentication#faqs
-                    requestedScopes: [
-                        appleAuth.Scope.FULL_NAME,
-                        appleAuth.Scope.EMAIL,
-                    ],
-                })
-                .then((response) => {
-                    console.log(response);
-                    return response;
-                })
-                .catch((error) => {
-                    throw new Error("Apple Sign-In failed - ", error);
-                });
-
-            // Ensure Apple returned a user identityToken
-            if (!appleAuthRequestResponse?.identityToken) {
-                throw new Error(
-                    "Apple Sign-In failed - no identify token returned"
-                );
-            }
-
-            // Create a Firebase credential from the response
-            const { identityToken, nonce } = appleAuthRequestResponse;
-            const appleCredential = auth.AppleAuthProvider.credential(
-                identityToken,
-                nonce
-            );
-
-            // Apple Sign-In is complete
-            console.log(`Apple Sign-In complete!`, appleCredential);
-
-            // Sign the user in with the credential
-            const userCredential = await auth().signInWithCredential(
-                appleCredential
-            );
-
-            if (!userCredential?.user?.uid)
-                throw new Error("User ID not found");
-
-            const docRef = firestore()
-                .collection("users")
-                .doc(userCredential.user.uid);
-
-            console.log("auth().currentUser: ", auth().currentUser?.uid);
-            console.log("docRef: ", docRef.id);
-
-            firestore()
-                .collection("users")
-                .doc(userCredential.user.uid)
-                .set({
+        onAppleButtonPress()
+            .then(async () => {
+                console.log("Apple sign-in complete!");
+                const uid = auth().currentUser?.uid;
+                if (!uid) throw new Error("User ID not found");
+                await saveUserData(uid, {
                     gender: gender,
                     age: age,
                     skinType: skinType,
                     skinTrouble: skinTrouble,
-                })
-                .then(() => {
-                    console.log("User added!");
-                })
-                .catch((error) => {
-                    throw new Error("Error adding user: ", error);
+                }).then(() => {
+                    alert("ユーザーが作成されました。");
+                    router.push("/(tabs)");
                 });
-        } catch (error) {
-            alert("ユーザーが作成できませんでした。");
-            console.log("ユーザーが作成できませんでした。: ", error);
-        }
-    }
+            })
+            .catch((error) => {
+                alert("ユーザーが作成できませんでした。");
+                console.log("ユーザーが作成できませんでした。: ", error);
+            });
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -186,6 +132,7 @@ export default function SignUp() {
                 <AppleButton
                     buttonStyle={AppleButton.Style.BLACK}
                     buttonType={AppleButton.Type.SIGN_IN}
+                    buttonText="Sign in with Apple"
                     style={{
                         width: 300,
                         height: 45,

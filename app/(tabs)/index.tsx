@@ -1,10 +1,13 @@
-import { Image, StyleSheet, Platform, View, Text } from "react-native";
+import { Image, StyleSheet, Platform, View, Text, Button } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Link } from "expo-router";
+import React from "react";
+
+import auth from "@react-native-firebase/auth";
 
 export default function HomeScreen() {
     return (
@@ -17,6 +20,7 @@ export default function HomeScreen() {
                 />
             }
         >
+            <Button title="Signout" onPress={() => auth().signOut()} />
             <ThemedView style={styles.titleContainer}>
                 <ThemedText type="title">Welcome!</ThemedText>
                 <HelloWave />
