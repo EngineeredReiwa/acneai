@@ -7,12 +7,22 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { useState } from "react";
-import { AppleButton } from "@invertase/react-native-apple-authentication";
+
+import { useEffect, useState } from "react";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { ThemedText } from "@/components/ThemedText";
+
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+
+import {
+    appleAuth,
+    AppleButton,
+} from "@invertase/react-native-apple-authentication";
 
 export default function SignUp() {
+    const [credential, setCredential] = useState<any>(null);
+
     const buttonColor = useThemeColor({}, "button");
     const systemColor = useThemeColor({}, "system");
 
@@ -27,6 +37,96 @@ export default function SignUp() {
 
     const skinTroubleList = ["ニキビ"];
     const [skinTrouble, setSkinTrouble] = useState("");
+
+    const [errorText, setErrorText] = useState<string | null>(null);
+    const handleSignIn = () => {
+        if (
+            gender === "" ||
+            age === "" ||
+            skinType === "" ||
+            skinTrouble === ""
+        ) {
+            setErrorText("すべての項目を選択してください。");
+            return;
+        }
+
+        setErrorText(null); // エラーがない場合はエラーをクリア
+        onAppleButtonPress().then(() => console.log("Apple sign-in complete!"));
+    };
+
+    async function onAppleButtonPress() {
+        try {
+            // Start the sign-in request
+            const appleAuthRequestResponse = await appleAuth
+                .performRequest({
+                    requestedOperation: appleAuth.Operation.LOGIN,
+                    // As per the FAQ of react-native-apple-authentication, the name should come first in the following array.
+                    // See: https://github.com/invertase/react-native-apple-authentication#faqs
+                    requestedScopes: [
+                        appleAuth.Scope.FULL_NAME,
+                        appleAuth.Scope.EMAIL,
+                    ],
+                })
+                .then((response) => {
+                    console.log(response);
+                    return response;
+                })
+                .catch((error) => {
+                    throw new Error("Apple Sign-In failed - ", error);
+                });
+
+            // Ensure Apple returned a user identityToken
+            if (!appleAuthRequestResponse?.identityToken) {
+                throw new Error(
+                    "Apple Sign-In failed - no identify token returned"
+                );
+            }
+
+            // Create a Firebase credential from the response
+            const { identityToken, nonce } = appleAuthRequestResponse;
+            const appleCredential = auth.AppleAuthProvider.credential(
+                identityToken,
+                nonce
+            );
+
+            // Apple Sign-In is complete
+            console.log(`Apple Sign-In complete!`, appleCredential);
+
+            // Sign the user in with the credential
+            const userCredential = await auth().signInWithCredential(
+                appleCredential
+            );
+
+            if (!userCredential?.user?.uid)
+                throw new Error("User ID not found");
+
+            const docRef = firestore()
+                .collection("users")
+                .doc(userCredential.user.uid);
+
+            console.log("auth().currentUser: ", auth().currentUser?.uid);
+            console.log("docRef: ", docRef.id);
+
+            firestore()
+                .collection("users")
+                .doc(userCredential.user.uid)
+                .set({
+                    gender: gender,
+                    age: age,
+                    skinType: skinType,
+                    skinTrouble: skinTrouble,
+                })
+                .then(() => {
+                    console.log("User added!");
+                })
+                .catch((error) => {
+                    throw new Error("Error adding user: ", error);
+                });
+        } catch (error) {
+            alert("ユーザーが作成できませんでした。");
+            console.log("ユーザーが作成できませんでした。: ", error);
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -63,7 +163,26 @@ export default function SignUp() {
             </ScrollView>
             {/* 画面下に固定された島 */}
             <View style={styles.fixedIslandContainer}>
-                {/* <Text>{errorText}</Text> */}
+                {errorText ? (
+                    <ThemedText
+                        type="defaultSemiBold"
+                        style={{
+                            color: "red",
+                            marginBottom: 5,
+                        }}
+                    >
+                        {errorText}
+                    </ThemedText>
+                ) : (
+                    <ThemedText
+                        type="default"
+                        style={{
+                            margin: 5,
+                        }}
+                    >
+                        選択が完了したら、サインインしてください。
+                    </ThemedText>
+                )}
                 <AppleButton
                     buttonStyle={AppleButton.Style.BLACK}
                     buttonType={AppleButton.Type.SIGN_IN}
@@ -71,7 +190,9 @@ export default function SignUp() {
                         width: 300,
                         height: 45,
                     }}
-                    onPress={() => {}}
+                    onPress={() => {
+                        handleSignIn();
+                    }}
                 />
             </View>
         </SafeAreaView>
