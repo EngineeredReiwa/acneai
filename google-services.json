@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "691288654605",
+    "project_id": "acneai",
+    "storage_bucket": "acneai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691288654605:android:68ee2dcb506c1b11f26644",
+        "android_client_info": {
+          "package_name": "com.EngineeredReiwa.AcneAI"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "691288654605-gcldoldgl17hu3cp0d9bsjm1o582nbsa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDbDtzyLZtfYQRPe1XNnI7-Ar-6tMuoSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "691288654605-gcldoldgl17hu3cp0d9bsjm1o582nbsa.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "691288654605-9k500kkbbvt7sbfq13j17vt2r5fsdrur.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.EngineeredReiwa.AcneAI"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

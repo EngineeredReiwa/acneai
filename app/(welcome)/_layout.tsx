@@ -63,7 +63,7 @@ export default function WelcomeLayout() {
                     name="signup"
                     options={{
                         headerLeft: () => (
-                            <Link href="/(welcome)">
+                            <Link href="/(welcome)/confirm">
                                 <Ionicons
                                     name="chevron-back-outline"
                                     size={24}
