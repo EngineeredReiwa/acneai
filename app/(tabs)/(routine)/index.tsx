@@ -16,9 +16,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Routine as RoutineType, useSession } from "@/context/RoutineContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function Index() {
     const { AMroutines, delAMRoutine, PMroutines, delPMRoutine } = useSession();
+    const btColor = useThemeColor({}, "button");
 
     // routines配列を、表示するために整形
     // routines[i].dataが空の場合、そのroutines[i]を削除
@@ -38,9 +40,11 @@ export default function Index() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={{ width: "100%", flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
                 <SectionList
-                    ListHeaderComponent={<Text>AM</Text>}
+                    ListHeaderComponent={
+                        <ThemedText type="subtitle">AM</ThemedText>
+                    }
                     sections={visibleAMRoutines}
                     keyExtractor={(item, index) => item.productId}
                     renderItem={({ item, index, section }) => (
@@ -50,13 +54,19 @@ export default function Index() {
                         />
                     )}
                     renderSectionHeader={({ section: { category } }) => (
-                        <Text>{category}</Text>
+                        <ThemedText type="subtitle">{category}</ThemedText>
                     )}
                     scrollEnabled={false}
-                    ListEmptyComponent={<Text>Empty</Text>}
+                    ListEmptyComponent={
+                        <ThemedText type="subtitle">
+                            ルーティンが選択されていません。
+                        </ThemedText>
+                    }
                 />
                 <SectionList
-                    ListHeaderComponent={<Text>PM</Text>}
+                    ListHeaderComponent={
+                        <ThemedText type="subtitle">PM</ThemedText>
+                    }
                     sections={visiblePMRoutines}
                     keyExtractor={(item, index) => index + item.productId}
                     renderItem={({ item, index, section }) => (
@@ -66,34 +76,43 @@ export default function Index() {
                         />
                     )}
                     renderSectionHeader={({ section: { category } }) => (
-                        <Text>{category}</Text>
+                        <ThemedText type="subtitle" style={{ color: "white" }}>
+                            {category}
+                        </ThemedText>
                     )}
                     scrollEnabled={false}
-                    ListEmptyComponent={<Text>Empty</Text>}
+                    ListEmptyComponent={
+                        <ThemedText type="subtitle">
+                            ルーティンが選択されていません。
+                        </ThemedText>
+                    }
                 />
             </ScrollView>
-            <View style={styles.fixedIslandContainer}>
-                <TouchableOpacity style={{ width: "80%" }} onPress={() => {}}>
-                    <Text>送信</Text>
+            <View style={styles.buttons}>
+                <TouchableOpacity
+                    style={[styles.sendButton, { borderColor: btColor }]}
+                    onPress={() => {}}
+                >
+                    <Ionicons name="send" size={28} color={btColor} />
+                    <ThemedText
+                        type="defaultSemiBold"
+                        style={{ color: btColor }}
+                    >
+                        ルーティンを解析
+                    </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={{
-                        flexDirection: "row",
-                        // 透明な灰色
-                        backgroundColor: "rgba(200, 200,200, 0.9)",
-                        padding: 15,
-                        borderRadius: 10,
-                    }}
+                    style={[styles.addButton, { backgroundColor: btColor }]}
                     onPress={() => {
                         router.push({
                             pathname: "./category",
                         });
                     }}
                 >
-                    <Ionicons name="add" size={24} color="black" />
+                    <Ionicons name="add-circle" size={28} color="white" />
                     <ThemedText
                         type="defaultSemiBold"
-                        style={{ flex: 1, marginHorizontal: 10 }}
+                        style={{ color: "white" }}
                     >
                         ルーティンを追加
                     </ThemedText>
@@ -132,6 +151,7 @@ const Item = ({ i, o }: { i: RoutineType; o: () => void }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        margin: 10,
         flexDirection: "column",
         justifyContent: "flex-start",
     },
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "rgba(255, 255,255, 0.9)",
         borderColor: "#F5F5F5",
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderRadius: 10,
         padding: 10,
         marginVertical: 5,
@@ -175,15 +195,31 @@ const styles = StyleSheet.create({
         textAlign: "left",
     },
 
-    fixedIslandContainer: {
-        // position: "absolute",
-        // bottom: 0,
-        // left: 0,
-        // right: 0,
-        padding: 10,
-        borderTopWidth: 1,
-        borderColor: "#F5F5F5", // ボーダー（オプション）
-        alignItems: "center", // コンテンツを中央揃え
-        justifyContent: "flex-start",
+    buttons: {
+        height: 75,
+        paddingBottom: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    sendButton: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        marginHorizontal: 5,
+        padding: 5,
+        borderRadius: 10,
+        borderWidth: 1,
+        // 透明な灰色
+        backgroundColor: "white",
+    },
+    addButton: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 5,
+        padding: 5,
+        borderRadius: 10,
     },
 });
