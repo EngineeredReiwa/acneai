@@ -10,18 +10,16 @@ import {
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 
-import { useSession } from "../../ctx";
+import { useSession } from "../../context/UserContext";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { HelloWave } from "@/components/HelloWave";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { AppleButton } from "@invertase/react-native-apple-authentication";
-import { GoogleSigninButton } from "react-native-google-signin";
-import { onAppleButtonPress } from "../api/apple";
-import { onGoogleButtonPress } from "../api/google";
+import { onAppleButtonPress } from "@/api/apple";
+import { onGoogleButtonPress } from "@/api/google";
 
 export default function Welcome() {
-    const { signIn, signOut } = useSession();
     const color = useThemeColor({}, "button");
 
     return (

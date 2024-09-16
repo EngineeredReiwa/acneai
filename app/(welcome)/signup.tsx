@@ -18,8 +18,8 @@ import {
     appleAuth,
     AppleButton,
 } from "@invertase/react-native-apple-authentication";
-import { saveUserData } from "../api/firestore";
-import { onAppleButtonPress } from "../api/apple";
+import { saveUserData } from "@/api/firestore";
+import { onAppleButtonPress } from "@/api/apple";
 import { router } from "expo-router";
 
 export default function SignUp() {

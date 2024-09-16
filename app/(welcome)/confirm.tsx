@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Checkbox from "expo-checkbox";
 
-import { useSession } from "../../ctx";
+import { useSession } from "../../context/UserContext";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { HelloWave } from "@/components/HelloWave";
